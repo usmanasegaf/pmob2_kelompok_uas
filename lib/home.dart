@@ -114,7 +114,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       InkWell(
                         onTap: () {
                           debugPrint('Menu button tapped');
-                          Navigator.push(
+                          Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => const Settings()),
@@ -281,7 +281,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       InkWell(
                         onTap: () {
                           debugPrint('Generate button tapped');
-                          Navigator.push(
+                          Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => const MakeReport()),
@@ -335,7 +335,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       InkWell(
                         onTap: () {
                           debugPrint('History button tapped');
-                          Navigator.push(
+                          Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => const History()),
