@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:pmob2_kelompok_uas/history.dart';
+import 'package:pmob2_kelompok_uas/make_report.dart';
+import 'package:pmob2_kelompok_uas/settings.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -111,6 +114,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       InkWell(
                         onTap: () {
                           debugPrint('Menu button tapped');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Settings()),
+                          );
                         },
                         child: MouseRegion(
                           cursor: SystemMouseCursors.click,
@@ -273,6 +281,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       InkWell(
                         onTap: () {
                           debugPrint('Generate button tapped');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const MakeReport()),
+                          );
                         },
                         child: MouseRegion(
                           cursor: SystemMouseCursors.click,
@@ -322,6 +335,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       InkWell(
                         onTap: () {
                           debugPrint('History button tapped');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const History()),
+                          );
                         },
                         child: MouseRegion(
                           cursor: SystemMouseCursors.click,
