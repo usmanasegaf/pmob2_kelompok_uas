@@ -83,6 +83,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onChanged: (bool value) {
                 setState(() {
                   _vibrateEnabled = value;
+                  debugPrint("toogle vibration");
                 });
               },
             ),
@@ -96,6 +97,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onChanged: (bool value) {
                 setState(() {
                   _beepEnabled = value;
+                  debugPrint("toogle beep");
                 });
               },
             ),
