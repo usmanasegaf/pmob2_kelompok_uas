@@ -42,7 +42,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         children: [
           // Background Container berwarna abu-abu
           Container(
-            color: const Color.fromARGB(141, 66, 66, 66),
+            color: const Color(0xFF1E1E1E),
           ),
           SafeArea(
             child: Column(
@@ -281,6 +281,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       InkWell(
                         onTap: () {
                           debugPrint('Generate button tapped');
+                          //setelah generate:
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
