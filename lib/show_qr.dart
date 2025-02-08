@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const ShowQr());
-} // buat tes dart individu
+// void main() {
+//   runApp(const ShowQr());
+// } // buat tes dart individu
 
 class ShowQr extends StatelessWidget {
   const ShowQr({super.key});
