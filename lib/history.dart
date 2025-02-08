@@ -10,50 +10,57 @@ class History extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.dark,
       ),
-      home: HistoryScreen(),
+      home: const HistoryScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class HistoryScreen extends StatelessWidget {
+class HistoryScreen extends StatefulWidget {
   const HistoryScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    // Saat sudah ada database digantikan dengan yang berasa dari database:
-    List<String> historyScanItems = [
-      'Nama Laporan - lokasi - 15 Mei 2024, 09:30',
-      'Nama Laporan - lokasi - 16 Mei 2024, 10:30',
-      'Nama Laporan - lokasi - 17 Mei 2024, 12:00',
-      'Nama Laporan - lokasi - 18 Mei 2024, 14:30',
-      'Nama Laporan - lokasi - 19 Mei 2024, 15:00',
-      'Nama Laporan - lokasi - 20 Mei 2024, 16:30',
-      'Nama Laporan - lokasi - 15 Mei 2025, 09:30',
-      'Nama Laporan - lokasi - 16 Mei 2025, 00:30',
-      'Nama Laporan - lokasi - 17 Mei 2025, 02:00',
-      'Nama Laporan - lokasi - 18 Mei 2025, 04:30',
-      'Nama Laporan - lokasi - 19 Mei 2025, 05:00',
-      'Nama Laporan - lokasi - 20 Mei 2025, 06:30',
-    ];
-    //baiknya data sudah terurut dari database
-    List<String> historyCreateItems = [
-      'Nama Laporan - lokasi - 15 Mei 2025, 09:30',
-      'Nama Laporan - lokasi - 16 Mei 2025, 10:30',
-      'Nama Laporan - lokasi - 17 Mei 2025, 12:00',
-      'Nama Laporan - lokasi - 18 Mei 2025, 14:30',
-      'Nama Laporan - lokasi - 19 Mei 2025, 15:00',
-      'Nama Laporan - lokasi - 20 Mei 2025, 16:30',
-      'Nama Laporan - lokasi - 15 Mei 2025, 09:30',
-      'Nama Laporan - lokasi - 16 Mei 2025, 10:30',
-      'Nama Laporan - lokasi - 17 Mei 2025, 12:00',
-      'Nama Laporan - lokasi - 18 Mei 2025, 14:30',
-      'Nama Laporan - lokasi - 19 Mei 2025, 15:00',
-      'Nama Laporan - lokasi - 20 Mei 2025, 16:30',
-    ];
+  State<HistoryScreen> createState() => _HistoryScreenState();
+}
 
+class _HistoryScreenState extends State<HistoryScreen> {
+  bool isScanActive = true;
+// formatnya saat dimasukkan seperti dicontoh bawah dengan "-" sebagai sekatnya
+// diganti dengan yang ada di database
+  List<String> historyScanItems = [
+    'Nama Laporan Scan - lokasi - 15 Mei 2024, 09:30',
+    'Nama Laporan - lokasi - 16 Mei 2024, 10:30',
+    'Nama Laporan - lokasi - 17 Mei 2024, 12:00',
+    'Nama Laporan - lokasi - 18 Mei 2024, 14:30',
+    'Nama Laporan - lokasi - 19 Mei 2024, 15:00',
+    'Nama Laporan - lokasi - 20 Mei 2024, 16:30',
+    'Nama Laporan - lokasi - 15 Mei 2025, 09:30',
+    'Nama Laporan - lokasi - 16 Mei 2025, 00:30',
+    'Nama Laporan - lokasi - 17 Mei 2025, 02:00',
+    'Nama Laporan - lokasi - 18 Mei 2025, 04:30',
+    'Nama Laporan - lokasi - 19 Mei 2025, 05:00',
+    'Nama Laporan - lokasi - 20 Mei 2025, 06:30',
+  ];
+// bagusnya sudah terurut dari database
+  List<String> historyCreateItems = [
+    'Nama Laporan Create - lokasi - 15 Mei 2025, 09:30',
+    'Nama Laporan - lokasi - 16 Mei 2025, 00:30',
+    'Nama Laporan - lokasi - 17 Mei 2025, 02:00',
+    'Nama Laporan - lokasi - 18 Mei 2025, 04:30',
+    'Nama Laporan - lokasi - 19 Mei 2025, 05:00',
+    'Nama Laporan - lokasi - 20 Mei 2025, 06:30',
+    'Nama Laporan - lokasi - 15 Mei 2025, 09:30',
+    'Nama Laporan - lokasi - 16 Mei 2025, 00:30',
+    'Nama Laporan - lokasi - 17 Mei 2025, 02:00',
+    'Nama Laporan - lokasi - 18 Mei 2025, 04:30',
+    'Nama Laporan - lokasi - 19 Mei 2025, 05:00',
+    'Nama Laporan - lokasi - 20 Mei 2025, 06:30',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF1E1E1E),
+      backgroundColor: const Color(0xFF1E1E1E),
       body: SafeArea(
         child: Column(
           children: [
@@ -69,16 +76,16 @@ class HistoryScreen extends StatelessWidget {
                       );
                     },
                     child: Container(
-                      padding: EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: Colors.black26,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Icon(Icons.arrow_back, color: Colors.orange),
+                      child: const Icon(Icons.arrow_back, color: Colors.orange),
                     ),
                   ),
-                  SizedBox(width: 16),
-                  Text(
+                  const SizedBox(width: 16),
+                  const Text(
                     'History',
                     style: TextStyle(fontSize: 24, color: Colors.white),
                   ),
@@ -89,37 +96,62 @@ class HistoryScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Color(0xFF2C2C2C),
+                  color: const Color(0xFF2C2C2C),
                   borderRadius: BorderRadius.circular(25),
                 ),
                 child: Row(
                   children: [
                     Expanded(
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.orange,
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Scan',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isScanActive = true;
+                          });
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: isScanActive
+                                ? Colors.orange
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'Scan',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
                     Expanded(
-                      child: Center(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 12),
-                          child: Text(
-                            'Create',
-                            style: TextStyle(
-                              color: Colors.white,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isScanActive = false;
+                          });
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: !isScanActive
+                                ? Colors.orange
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'Create',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
@@ -129,18 +161,21 @@ class HistoryScreen extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Expanded(
               child: ListView.builder(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                itemCount: historyScanItems.length,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: isScanActive
+                    ? historyScanItems.length
+                    : historyCreateItems.length,
                 itemBuilder: (context, index) {
-                  final parts = historyScanItems[index].split(' - ');
-
+                  final items =
+                      isScanActive ? historyScanItems : historyCreateItems;
+                  final parts = items[index].split(' - ');
                   return Container(
-                    margin: EdgeInsets.only(bottom: 12),
+                    margin: const EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
-                      color: Color(0xFF2C2C2C),
+                      color: const Color(0xFF2C2C2C),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -152,12 +187,12 @@ class HistoryScreen extends StatelessWidget {
                               debugPrint("Tombol buka history");
                             },
                             child: Padding(
-                              padding: EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(12),
                               child: Row(
                                 children: [
-                                  Icon(Icons.qr_code_2,
+                                  const Icon(Icons.qr_code_2,
                                       color: Colors.orange, size: 24),
-                                  SizedBox(width: 12),
+                                  const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
@@ -165,14 +200,14 @@ class HistoryScreen extends StatelessWidget {
                                       children: [
                                         Text(
                                           parts[0],
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.w500,
                                           ),
                                         ),
                                         Text(
                                           parts[1],
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             color: Colors.grey,
                                             fontSize: 12,
                                           ),
@@ -182,7 +217,7 @@ class HistoryScreen extends StatelessWidget {
                                   ),
                                   Text(
                                     parts[2],
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: Colors.grey,
                                       fontSize: 12,
                                     ),
@@ -198,8 +233,8 @@ class HistoryScreen extends StatelessWidget {
                             debugPrint("Tombol Hapus");
                           },
                           child: Padding(
-                            padding: EdgeInsets.all(12),
-                            child: Icon(Icons.delete_outline,
+                            padding: const EdgeInsets.all(12),
+                            child: const Icon(Icons.delete_outline,
                                 color: Colors.orange, size: 20),
                           ),
                         ),
