@@ -21,6 +21,7 @@ class HistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Saat sudah ada database digantikan dengan yang berasa dari database:
     List<String> historyScanItems = [
       'Nama Laporan - lokasi - 15 Mei 2024, 09:30',
       'Nama Laporan - lokasi - 16 Mei 2024, 10:30',
@@ -34,6 +35,21 @@ class HistoryScreen extends StatelessWidget {
       'Nama Laporan - lokasi - 18 Mei 2025, 04:30',
       'Nama Laporan - lokasi - 19 Mei 2025, 05:00',
       'Nama Laporan - lokasi - 20 Mei 2025, 06:30',
+    ];
+    //baiknya data sudah terurut dari database
+    List<String> historyCreateItems = [
+      'Nama Laporan - lokasi - 15 Mei 2025, 09:30',
+      'Nama Laporan - lokasi - 16 Mei 2025, 10:30',
+      'Nama Laporan - lokasi - 17 Mei 2025, 12:00',
+      'Nama Laporan - lokasi - 18 Mei 2025, 14:30',
+      'Nama Laporan - lokasi - 19 Mei 2025, 15:00',
+      'Nama Laporan - lokasi - 20 Mei 2025, 16:30',
+      'Nama Laporan - lokasi - 15 Mei 2025, 09:30',
+      'Nama Laporan - lokasi - 16 Mei 2025, 10:30',
+      'Nama Laporan - lokasi - 17 Mei 2025, 12:00',
+      'Nama Laporan - lokasi - 18 Mei 2025, 14:30',
+      'Nama Laporan - lokasi - 19 Mei 2025, 15:00',
+      'Nama Laporan - lokasi - 20 Mei 2025, 16:30',
     ];
 
     return Scaffold(
