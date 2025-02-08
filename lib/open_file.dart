@@ -104,7 +104,8 @@ class OpenFileUI extends StatelessWidget {
                           child: const Text(
                             "https://www.youtube.com/watch?v=Zd9g7sKvgIM (untuk isian qr karna bisa banyak) "
                             "ini di test apabila banyak textnya zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz "
-                            "ok sepertinya bisa untuk kebawah sekarang tinggal proteksi buat overflow",
+                            "ok sepertinya bisa untuk kebawah sekarang tinggal proteksi buat overflow"
+                            "ok sudah terpasang proteksi overflow",
                             style: TextStyle(color: Colors.white),
                           ),
                         ),
