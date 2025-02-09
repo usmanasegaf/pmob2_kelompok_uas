@@ -30,31 +30,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
   List<String> historyScanItems = [
     'Nama Laporan Scan - lokasi - 15 Mei 2024, 09:30',
     'Nama Laporan - lokasi - 16 Mei 2024, 10:30',
-    'Nama Laporan - lokasi - 17 Mei 2024, 12:00',
-    'Nama Laporan - lokasi - 18 Mei 2024, 14:30',
-    'Nama Laporan - lokasi - 19 Mei 2024, 15:00',
-    'Nama Laporan - lokasi - 20 Mei 2024, 16:30',
-    'Nama Laporan - lokasi - 15 Mei 2025, 09:30',
-    'Nama Laporan - lokasi - 16 Mei 2025, 00:30',
-    'Nama Laporan - lokasi - 17 Mei 2025, 02:00',
-    'Nama Laporan - lokasi - 18 Mei 2025, 04:30',
-    'Nama Laporan - lokasi - 19 Mei 2025, 05:00',
-    'Nama Laporan - lokasi - 20 Mei 2025, 06:30',
   ];
 // bagusnya sudah terurut dari database
   List<String> historyCreateItems = [
     'Nama Laporan Create - lokasi - 15 Mei 2025, 09:30',
     'Nama Laporan - lokasi - 16 Mei 2025, 00:30',
-    'Nama Laporan - lokasi - 17 Mei 2025, 02:00',
-    'Nama Laporan - lokasi - 18 Mei 2025, 04:30',
-    'Nama Laporan - lokasi - 19 Mei 2025, 05:00',
-    'Nama Laporan - lokasi - 20 Mei 2025, 06:30',
-    'Nama Laporan - lokasi - 15 Mei 2025, 09:30',
-    'Nama Laporan - lokasi - 16 Mei 2025, 00:30',
-    'Nama Laporan - lokasi - 17 Mei 2025, 02:00',
-    'Nama Laporan - lokasi - 18 Mei 2025, 04:30',
-    'Nama Laporan - lokasi - 19 Mei 2025, 05:00',
-    'Nama Laporan - lokasi - 20 Mei 2025, 06:30',
   ];
 
   @override
