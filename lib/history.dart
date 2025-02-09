@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pmob2_kelompok_uas/home.dart';
-import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:pmob2_kelompok_uas/home.dart';
 
 class History extends StatelessWidget {
   const History({super.key});
@@ -9,9 +9,7 @@ class History extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        brightness: Brightness.dark,
-      ),
+      theme: ThemeData(brightness: Brightness.dark),
       home: const HistoryScreen(),
       debugShowCheckedModeBanner: false,
     );
@@ -27,17 +25,41 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   bool isScanActive = true;
-// formatnya saat dimasukkan seperti dicontoh bawah dengan "-" sebagai sekatnya
-// diganti dengan yang ada di database
-  List<String> historyScanItems = [
-    'Nama Laporan Scan - lokasi - 15 Mei 2024, 09:30',
-    'Nama Laporan - lokasi - 16 Mei 2024, 10:30',
-  ];
-// bagusnya sudah terurut dari database
-  List<String> historyCreateItems = [
-    'Nama Laporan Create - lokasi - 15 Mei 2025, 09:30',
-    'Nama Laporan - lokasi - 16 Mei 2025, 00:30',
-  ];
+  List<String> historyScanItems = [];
+  List<String> historyCreateItems = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchHistoryData();
+  }
+
+  Future<void> fetchHistoryData() async {
+    final scanResponse =
+        await http.get(Uri.parse('http://localhost:3000/api/laporan_scan'));
+    final createResponse =
+        await http.get(Uri.parse('http://localhost:3000/api/laporan_create'));
+
+    if (scanResponse.statusCode == 200) {
+      List<dynamic> scanData = json.decode(scanResponse.body);
+      setState(() {
+        historyScanItems = scanData
+            .map((item) =>
+                '${item['nama_laporan']} - ${item['lokasi']} - ${item['tanggal']}')
+            .toList();
+      });
+    }
+
+    if (createResponse.statusCode == 200) {
+      List<dynamic> createData = json.decode(createResponse.body);
+      setState(() {
+        historyCreateItems = createData
+            .map((item) =>
+                '${item['nama_laporan']} - ${item['lokasi']} - ${item['tanggal']}')
+            .toList();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -166,7 +188,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           child: InkWell(
                             onTap: () {
                               debugPrint('Item ${parts[0]} diklik');
-                              debugPrint("Tombol buka history");
                             },
                             child: Padding(
                               padding: const EdgeInsets.all(12),
@@ -212,11 +233,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         InkWell(
                           onTap: () {
                             debugPrint('Hapus item ${parts[0]}');
-                            debugPrint("Tombol Hapus");
                           },
-                          child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: const Icon(Icons.delete_outline,
+                          child: const Padding(
+                            padding: EdgeInsets.all(12),
+                            child: Icon(Icons.delete_outline,
                                 color: Colors.orange, size: 20),
                           ),
                         ),
