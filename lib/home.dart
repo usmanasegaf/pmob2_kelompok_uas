@@ -3,6 +3,9 @@ import 'package:pmob2_kelompok_uas/history.dart';
 import 'package:pmob2_kelompok_uas/make_report.dart';
 import 'package:pmob2_kelompok_uas/settings.dart';
 import 'package:camera/camera.dart';
+import 'package:pmob2_kelompok_uas/show_qr.dart';
+import 'dart:convert';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -16,6 +19,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   late Animation<double> _animation;
   CameraController? _cameraController;
   bool _isCameraAvailable = true;
+  String? scannedData;
 
   @override
   void initState() {
@@ -33,6 +37,82 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           });
 
     _initializeCamera();
+  }
+
+  void _scanQRCode() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.orange,
+        title:
+            const Text("Scan QR Code", style: TextStyle(color: Colors.white)),
+        content: SizedBox(
+          height: 250,
+          width: 250,
+          child: MobileScanner(
+            onDetect: (capture) async {
+              final List<Barcode> barcodes = capture.barcodes;
+              if (barcodes.isNotEmpty) {
+                final rawValue = barcodes.first.rawValue;
+                if (rawValue != null) {
+                  // Validasi format JSON
+                  try {
+                    // Mencoba parse JSON
+                    final jsonData = json.decode(rawValue);
+
+                    // Validasi field yang diperlukan
+                    if (jsonData is Map<String, dynamic> &&
+                        jsonData['nama_laporan'] != null &&
+                        jsonData['lokasi'] != null &&
+                        jsonData['tanggal'] != null &&
+                        jsonData['deskripsi'] != null) {
+                      setState(() {
+                        scannedData = rawValue;
+                      });
+
+                      if (mounted) {
+                        Navigator.pop(context); // Tutup dialog scanner
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ShowQr(scannedData: rawValue),
+                          ),
+                        );
+                      }
+                    } else {
+                      // JSON valid tapi tidak memiliki field yang diperlukan
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                'QR Code tidak sesuai format yang diperlukan'),
+                          ),
+                        );
+                      }
+                    }
+                  } catch (e) {
+                    // Bukan format JSON yang valid
+                    setState(() {
+                      scannedData = rawValue;
+                    });
+
+                    if (mounted) {
+                      Navigator.pop(context); // Tutup dialog scanner
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ShowQr(scannedData: rawValue),
+                        ),
+                      );
+                    }
+                  }
+                }
+              }
+            },
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _initializeCamera() async {
@@ -360,6 +440,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       // Tombol Scan (Orange)
                       InkWell(
                         onTap: () {
+                          _scanQRCode();
                           debugPrint('Scan button tapped');
                         },
                         child: MouseRegion(
