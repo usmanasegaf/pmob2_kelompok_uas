@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pmob2_kelompok_uas/home.dart';
-
-// void main() {
-//   runApp(MakeReport());
-// } //untuk tes dart satu-satu blok lalu ctrl + / untuk membuka
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class MakeReport extends StatelessWidget {
   const MakeReport({super.key});
@@ -21,10 +19,59 @@ class MakeReport extends StatelessWidget {
   }
 }
 
-class ReportScreen extends StatelessWidget {
-  // Format current date and time
+class ReportScreen extends StatefulWidget {
+  @override
+  _ReportScreenState createState() => _ReportScreenState();
+}
+
+class _ReportScreenState extends State<ReportScreen> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  String? qrCodeUrl;
+  bool isLoading = false;
+
   String getCurrentDateTime() {
     return DateFormat('dd MMM yyyy, HH:mm').format(DateTime.now());
+  }
+
+  Future<void> _generateQRCode() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    final String apiUrl = 'http://localhost:3000/api/laporan_create';
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'nama_laporan': _nameController.text,
+          'lokasi': _locationController.text,
+          'tanggal': DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+          'deskripsi': _descriptionController.text,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          qrCodeUrl = data['qrCode'];
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to generate report')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -99,21 +146,27 @@ class ReportScreen extends StatelessWidget {
                         SizedBox(height: 24),
 
                         // Form fields
-                        _buildTextField('Report name', 'Enter name'),
-                        SizedBox(height: 16),
-                        _buildTextField('Date and Time', getCurrentDateTime(),
-                            enabled: false),
-                        SizedBox(height: 16),
-                        _buildTextField('Location', 'Enter location'),
+                        _buildTextField(
+                            'Report name', 'Enter name', _nameController),
                         SizedBox(height: 16),
                         _buildTextField(
-                            'Report Description', 'Enter any details',
-                            maxLines: 4),
+                            'Date and Time', getCurrentDateTime(), null,
+                            enabled: false),
+                        SizedBox(height: 16),
+                        _buildTextField(
+                            'Location', 'Enter location', _locationController),
+                        SizedBox(height: 16),
+                        _buildTextField(
+                          'Report Description',
+                          'Enter any details',
+                          _descriptionController,
+                          maxLines: 4,
+                        ),
                         SizedBox(height: 32),
 
                         // Generate QR Code button
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: isLoading ? null : _generateQRCode,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orange,
                             minimumSize: Size(200, 45),
@@ -121,15 +174,40 @@ class ReportScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          child: Text(
-                            'Generate QR Code',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                          child: isLoading
+                              ? SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.black,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Text(
+                                  'Generate QR Code',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                        ),
+
+                        if (qrCodeUrl != null) ...[
+                          SizedBox(height: 24),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: EdgeInsets.all(16),
+                            child: Image.network(
+                              qrCodeUrl!,
+                              height: 200,
+                              width: 200,
                             ),
                           ),
-                        ),
+                        ],
                       ],
                     ),
                   ),
@@ -142,7 +220,8 @@ class ReportScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(String label, String hint,
+  Widget _buildTextField(
+      String label, String hint, TextEditingController? controller,
       {bool enabled = true, int maxLines = 1}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,6 +235,7 @@ class ReportScreen extends StatelessWidget {
         ),
         SizedBox(height: 8),
         TextField(
+          controller: controller,
           enabled: enabled,
           maxLines: maxLines,
           decoration: InputDecoration(
