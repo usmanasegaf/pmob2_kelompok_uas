@@ -71,16 +71,23 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       body: Stack(
         children: [
           // Kamera
-          _isCameraAvailable && _cameraController?.value.isInitialized == true
-              ? CameraPreview(_cameraController!)
-              : Container(
-                  color: Colors.black,
-                  alignment: Alignment.center,
-                  child: const Text(
-                    'Device has no camera',
-                    style: TextStyle(color: Colors.white, fontSize: 18),
+          Center(
+            child: _isCameraAvailable &&
+                    _cameraController?.value.isInitialized == true
+                ? AspectRatio(
+                    aspectRatio: _cameraController!.value.aspectRatio,
+                    child: CameraPreview(_cameraController!),
+                  )
+                : Container(
+                    color: Colors.black,
+                    alignment: Alignment.center,
+                    child: const Text(
+                      'Device has no camera',
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
                   ),
-                ),
+          ),
+
           SafeArea(
             child: Column(
               children: [
