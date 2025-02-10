@@ -34,7 +34,7 @@ class _ShowQrScreenState extends State<ShowQrScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('YOUR_BACKEND_URL/scan'), // Ganti dengan URL backend Anda
+        Uri.parse('http://localhost:3000/scan'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'qr_code': widget.scannedData}),
       );
@@ -138,7 +138,7 @@ class _ShowQrScreenState extends State<ShowQrScreen> {
                     if (isValidFormat) ...[
                       const SizedBox(height: 10),
                       Text(
-                        'Nama Laporan: ${qrData!['nama_laporan']}',
+                        'Nama Laporan: ${qrData['nama_laporan']}',
                         style: const TextStyle(color: Colors.white),
                       ),
                       Text(
