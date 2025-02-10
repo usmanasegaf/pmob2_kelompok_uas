@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pmob2_kelompok_uas/history.dart';
 import 'package:pmob2_kelompok_uas/make_report.dart';
 import 'package:pmob2_kelompok_uas/settings.dart';
+import 'package:camera/camera.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -13,10 +14,13 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _animation;
+  CameraController? _cameraController;
+  bool _isCameraAvailable = true;
 
   @override
   void initState() {
     super.initState();
+
     _animationController = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
@@ -27,11 +31,37 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           ..addListener(() {
             setState(() {});
           });
+
+    _initializeCamera();
+  }
+
+  Future<void> _initializeCamera() async {
+    try {
+      final cameras = await availableCameras();
+      if (cameras.isNotEmpty) {
+        _cameraController =
+            CameraController(cameras[0], ResolutionPreset.medium);
+        await _cameraController!.initialize();
+        if (mounted) {
+          setState(() {});
+        }
+      } else {
+        setState(() {
+          _isCameraAvailable = false;
+        });
+      }
+    } catch (e) {
+      debugPrint("Error initializing camera: $e");
+      setState(() {
+        _isCameraAvailable = false;
+      });
+    }
   }
 
   @override
   void dispose() {
     _animationController.dispose();
+    _cameraController?.dispose();
     super.dispose();
   }
 
@@ -40,10 +70,17 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     return Scaffold(
       body: Stack(
         children: [
-          // Background Container berwarna abu-abu
-          Container(
-            color: const Color(0xFF1E1E1E),
-          ),
+          // Kamera
+          _isCameraAvailable && _cameraController?.value.isInitialized == true
+              ? CameraPreview(_cameraController!)
+              : Container(
+                  color: Colors.black,
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'Device has no camera',
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                ),
           SafeArea(
             child: Column(
               children: [
