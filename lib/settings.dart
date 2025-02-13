@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pmob2_kelompok_uas/home.dart';
-
-// void main() {
-//   runApp(Settings());
-// }
-// buat tes dart individu
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Settings extends StatelessWidget {
   const Settings({super.key});
@@ -29,6 +26,36 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _vibrateEnabled = true;
   bool _beepEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchSettings();
+  }
+
+  Future<void> _fetchSettings() async {
+    final response =
+        await http.get(Uri.parse('http://localhost:3000/api/settings'));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        _vibrateEnabled = data['vibrate'] == 1;
+        _beepEnabled = data['beep'] == 1;
+      });
+    }
+  }
+
+  Future<void> _updateSettings() async {
+    await http.post(
+      Uri.parse('http://localhost:3000/api/settings'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'vibrate': _vibrateEnabled ? 1 : 0,
+        'beep': _beepEnabled ? 1 : 0,
+      }),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,8 +110,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onChanged: (bool value) {
                 setState(() {
                   _vibrateEnabled = value;
-                  debugPrint("toogle vibration");
                 });
+                _updateSettings();
               },
             ),
 
@@ -97,8 +124,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onChanged: (bool value) {
                 setState(() {
                   _beepEnabled = value;
-                  debugPrint("toogle beep");
                 });
+                _updateSettings();
               },
             ),
           ],
