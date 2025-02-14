@@ -73,6 +73,32 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return id.toString();
   }
 
+  Future<void> _deleteHistoryItem(String itemId, bool isScan) async {
+    final endpoint = isScan ? 'laporan_scan' : 'laporan_create';
+    final url = Uri.parse('http://localhost:3000/api/$endpoint/$itemId');
+
+    try {
+      final response = await http.delete(url);
+      if (response.statusCode == 200) {
+        fetchHistoryData(); // Refresh data setelah hapus berhasil
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Item berhasil dihapus')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal menghapus item')),
+        );
+        debugPrint(
+            'Failed to delete item. Status code: ${response.statusCode}, response: ${response.body}');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Terjadi kesalahan saat menghapus item')),
+      );
+      debugPrint('Error deleting item: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -234,6 +260,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                             fontSize: 12,
                                           ),
                                         ),
+                                        Text(
+                                          id != null ? 'ID: $id' : '',
+                                          style: const TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: 10,
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -247,13 +280,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                           fontSize: 12,
                                         ),
                                       ),
-                                      Text(
-                                        id != null ? 'ID: $id' : '',
-                                        style: const TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 10,
-                                        ),
-                                      ),
                                     ],
                                   ),
                                 ],
@@ -263,8 +289,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         ),
                         InkWell(
                           onTap: () {
-                            debugPrint(
-                                'Hapus item ${item['nama_laporan']} (ID: $id)');
+                            if (id == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('ID item tidak valid')),
+                              );
+                              return;
+                            }
+                            _deleteHistoryItem(id, isScanActive);
                           },
                           child: const Padding(
                             padding: EdgeInsets.all(12),
