@@ -25,8 +25,8 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   bool isScanActive = true;
-  List<String> historyScanItems = [];
-  List<String> historyCreateItems = [];
+  List<Map<String, dynamic>> historyScanItems = [];
+  List<Map<String, dynamic>> historyCreateItems = [];
 
   @override
   void initState() {
@@ -35,30 +35,42 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Future<void> fetchHistoryData() async {
-    final scanResponse =
-        await http.get(Uri.parse('http://localhost:3000/api/laporan_scan'));
-    final createResponse =
-        await http.get(Uri.parse('http://localhost:3000/api/laporan_create'));
+    try {
+      final scanResponse =
+          await http.get(Uri.parse('http://localhost:3000/api/laporan_scan'));
+      final createResponse =
+          await http.get(Uri.parse('http://localhost:3000/api/laporan_create'));
 
-    if (scanResponse.statusCode == 200) {
-      List<dynamic> scanData = json.decode(scanResponse.body);
-      setState(() {
-        historyScanItems = scanData
-            .map((item) =>
-                '${item['nama_laporan']} - ${item['lokasi']} - ${item['tanggal']}')
-            .toList();
-      });
-    }
+      if (scanResponse.statusCode == 200) {
+        List<dynamic> scanData = json.decode(scanResponse.body);
+        debugPrint('Received scan data: $scanData');
+        setState(() {
+          historyScanItems = List<Map<String, dynamic>>.from(scanData);
+        });
+      }
 
-    if (createResponse.statusCode == 200) {
-      List<dynamic> createData = json.decode(createResponse.body);
-      setState(() {
-        historyCreateItems = createData
-            .map((item) =>
-                '${item['nama_laporan']} - ${item['lokasi']} - ${item['tanggal']}')
-            .toList();
-      });
+      if (createResponse.statusCode == 200) {
+        List<dynamic> createData = json.decode(createResponse.body);
+        debugPrint('Received create data: $createData');
+        setState(() {
+          historyCreateItems = List<Map<String, dynamic>>.from(createData);
+        });
+      }
+    } catch (e) {
+      debugPrint('Error fetching data: $e');
     }
+  }
+
+  String? _getIdFromItem(Map<String, dynamic> item, bool isScan) {
+    final idKey = isScan ? 'id_scan' : 'id_create';
+    final dynamic id = item[idKey];
+
+    // Handle different possible types
+    if (id == null) return null;
+    if (id is int) return id.toString();
+    if (id is String) return id;
+
+    return id.toString();
   }
 
   @override
@@ -175,7 +187,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 itemBuilder: (context, index) {
                   final items =
                       isScanActive ? historyScanItems : historyCreateItems;
-                  final parts = items[index].split(' - ');
+                  if (index >= items.length) {
+                    return null;
+                  }
+
+                  final item = items[index];
+                  final id = _getIdFromItem(item, isScanActive);
+
                   return Container(
                     margin: const EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
@@ -187,7 +205,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         Expanded(
                           child: InkWell(
                             onTap: () {
-                              debugPrint('Item ${parts[0]} diklik');
+                              debugPrint(
+                                  'Item ${item['nama_laporan']} (ID: $id) diklik');
                             },
                             child: Padding(
                               padding: const EdgeInsets.all(12),
@@ -202,14 +221,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          parts[0],
+                                          item['nama_laporan'] ?? 'Untitled',
                                           style: const TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.w500,
                                           ),
                                         ),
                                         Text(
-                                          parts[1],
+                                          item['lokasi'] ?? 'Unknown location',
                                           style: const TextStyle(
                                             color: Colors.grey,
                                             fontSize: 12,
@@ -218,12 +237,24 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                       ],
                                     ),
                                   ),
-                                  Text(
-                                    parts[2],
-                                    style: const TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 12,
-                                    ),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        item['tanggal'] ?? 'No date',
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      Text(
+                                        id != null ? 'ID: $id' : '',
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 10,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
@@ -232,7 +263,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         ),
                         InkWell(
                           onTap: () {
-                            debugPrint('Hapus item ${parts[0]}');
+                            debugPrint(
+                                'Hapus item ${item['nama_laporan']} (ID: $id)');
                           },
                           child: const Padding(
                             padding: EdgeInsets.all(12),
