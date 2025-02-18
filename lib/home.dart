@@ -21,6 +21,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   CameraController? _cameraController;
   bool _isCameraAvailable = true;
   String? scannedData;
+  bool _isFlashOn = false;
+  bool _isRearCameraSelected = true;
 
   @override
   void initState() {
@@ -121,8 +123,24 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     try {
       final cameras = await availableCameras();
       if (cameras.isNotEmpty) {
+        CameraDescription selectedCamera;
+
+        if (_isRearCameraSelected) {
+          selectedCamera = cameras.firstWhere(
+            (camera) => camera.lensDirection == CameraLensDirection.back,
+            orElse: () =>
+                cameras.first, // Default to first camera if rear not found
+          );
+        } else {
+          selectedCamera = cameras.firstWhere(
+            (camera) => camera.lensDirection == CameraLensDirection.front,
+            orElse: () =>
+                cameras.first, // Default to first camera if front not found
+          );
+        }
+
         _cameraController =
-            CameraController(cameras[0], ResolutionPreset.medium);
+            CameraController(selectedCamera, ResolutionPreset.medium);
         await _cameraController!.initialize();
         if (mounted) {
           setState(() {});
@@ -231,6 +249,37 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     }
   }
 
+  // Fungsi untuk mengontrol flash
+  Future<void> _toggleFlash() async {
+    if (_cameraController == null) return;
+
+    try {
+      if (_isFlashOn) {
+        await _cameraController!.setFlashMode(FlashMode.off);
+      } else {
+        await _cameraController!.setFlashMode(FlashMode.torch);
+      }
+      setState(() {
+        _isFlashOn = !_isFlashOn;
+      });
+    } catch (e) {
+      debugPrint("Error toggling flash: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error toggling flash: ${e.toString()}'),
+        ),
+      );
+    }
+  }
+
+  // Fungsi untuk memutar kamera
+  void _rotateCamera() async {
+    setState(() {
+      _isRearCameraSelected = !_isRearCameraSelected;
+    });
+    await _initializeCamera();
+  }
+
   @override
   void dispose() {
     _animationController.dispose();
@@ -302,6 +351,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       // Tombol Flash
                       InkWell(
                         onTap: () {
+                          _toggleFlash();
                           debugPrint('Flash button tapped');
                         },
                         child: MouseRegion(
@@ -312,15 +362,17 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               color: Colors.black54,
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: const Icon(Icons.flash_off,
+                            child: Icon(
+                                _isFlashOn ? Icons.flash_on : Icons.flash_off,
                                 color: Colors.white),
                           ),
                         ),
                       ),
-                      // Tombol Camera
+                      // Tombol Rotate Camera
                       InkWell(
                         onTap: () {
-                          debugPrint('Camera button tapped');
+                          _rotateCamera();
+                          debugPrint('Rotate camera button tapped');
                         },
                         child: MouseRegion(
                           cursor: SystemMouseCursors.click,
@@ -330,7 +382,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               color: Colors.black54,
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: const Icon(Icons.camera_alt,
+                            child: const Icon(Icons.flip_camera_ios,
                                 color: Colors.white),
                           ),
                         ),
