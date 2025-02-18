@@ -112,9 +112,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 children: [
                   InkWell(
                     onTap: () {
-                      Navigator.pushReplacement(
-                        context,
+                      Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(builder: (context) => const Home()),
+                        (Route<dynamic> route) => false,
                       );
                     },
                     child: Container(

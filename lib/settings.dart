@@ -71,9 +71,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: InkWell(
                 borderRadius: BorderRadius.circular(8),
                 onTap: () {
-                  Navigator.pushReplacement(
-                    context,
+                  Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(builder: (context) => const Home()),
+                    (Route<dynamic> route) => false,
                   );
                 },
                 child: Container(

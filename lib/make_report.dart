@@ -96,10 +96,10 @@ class _ReportScreenState extends State<ReportScreen> {
                       child: InkWell(
                         borderRadius: BorderRadius.circular(8),
                         onTap: () {
-                          Navigator.pushReplacement(
-                            context,
+                          Navigator.of(context).pushAndRemoveUntil(
                             MaterialPageRoute(
                                 builder: (context) => const Home()),
+                            (Route<dynamic> route) => false,
                           );
                         },
                         child: Padding(
