@@ -6,6 +6,7 @@ import 'package:camera/camera.dart';
 import 'package:pmob2_kelompok_uas/show_qr.dart';
 import 'dart:convert';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:image_picker/image_picker.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -51,9 +52,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           width: 250,
           child: MobileScanner(
             onDetect: (capture) async {
-              final List<Barcode> barcodes = capture.barcodes;
-              if (barcodes.isNotEmpty) {
-                final rawValue = barcodes.first.rawValue;
+              final List<Barcode>? barcodes = capture.barcodes;
+              if (barcodes != null && barcodes.isNotEmpty) {
+                final Barcode barcode = barcodes.first;
+                final rawValue = barcode.rawValue;
                 if (rawValue != null) {
                   // Validasi format JSON
                   try {
@@ -138,6 +140,97 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     }
   }
 
+  Future<void> _scanQRCodeFromGallery() async {
+    final imagePicker = ImagePicker();
+    final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile == null) {
+      // User cancelled image picking
+      return;
+    }
+
+    final filePath = pickedFile.path;
+    final mobileScanner = MobileScannerController();
+
+    try {
+      final BarcodeCapture? capture =
+          await mobileScanner.analyzeImage(filePath); // Get BarcodeCapture?
+      if (capture != null && capture.barcodes.isNotEmpty) {
+        // Check if capture is not null and barcodes is not empty
+        final Barcode barcode = capture.barcodes.first;
+        final rawValue = barcode.rawValue;
+        if (rawValue != null) {
+          // Validasi format JSON
+          try {
+            final jsonData = json.decode(rawValue);
+
+            // Validasi field yang diperlukan
+            if (jsonData is Map<String, dynamic> &&
+                jsonData['nama_laporan'] != null &&
+                jsonData['lokasi'] != null &&
+                jsonData['tanggal'] != null &&
+                jsonData['deskripsi'] != null) {
+              setState(() {
+                scannedData = rawValue;
+              });
+
+              if (mounted) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ShowQr(scannedData: rawValue),
+                  ),
+                );
+              }
+            } else {
+              // JSON valid tapi tidak memiliki field yang diperlukan
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content:
+                        Text('QR Code tidak sesuai format yang diperlukan'),
+                  ),
+                );
+              }
+            }
+          } catch (e) {
+            // Bukan format JSON yang valid
+            setState(() {
+              scannedData = rawValue;
+            });
+
+            if (mounted) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ShowQr(scannedData: rawValue),
+                ),
+              );
+            }
+          }
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('QR Code tidak terdeteksi'),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error scanning QR Code: ${e.toString()}'),
+          ),
+        );
+      }
+    } finally {
+      mobileScanner.dispose();
+    }
+  }
+
   @override
   void dispose() {
     _animationController.dispose();
@@ -156,7 +249,14 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                     _cameraController?.value.isInitialized == true
                 ? AspectRatio(
                     aspectRatio: _cameraController!.value.aspectRatio,
-                    child: CameraPreview(_cameraController!),
+                    child: FittedBox(
+                      fit: BoxFit.cover,
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height,
+                        child: CameraPreview(_cameraController!),
+                      ),
+                    ),
                   )
                 : Container(
                     color: Colors.black,
@@ -183,6 +283,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       // Tombol Gallery
                       InkWell(
                         onTap: () {
+                          _scanQRCodeFromGallery();
                           debugPrint('Gallery button tapped');
                         },
                         child: MouseRegion(
