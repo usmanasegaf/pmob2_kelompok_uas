@@ -238,10 +238,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       InkWell(
                         onTap: () {
                           debugPrint('Menu button tapped');
-                          Navigator.pushReplacement(
-                            context,
+                          Navigator.of(context).pushAndRemoveUntil(
                             MaterialPageRoute(
                                 builder: (context) => const Settings()),
+                            (Route<dynamic> route) => false,
                           );
                         },
                         child: MouseRegion(
@@ -406,10 +406,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                         onTap: () {
                           debugPrint('Generate button tapped');
                           //setelah generate:
-                          Navigator.pushReplacement(
-                            context,
+                          Navigator.of(context).pushAndRemoveUntil(
                             MaterialPageRoute(
                                 builder: (context) => const MakeReport()),
+                            (Route<dynamic> route) => false,
                           );
                         },
                         child: MouseRegion(
@@ -461,10 +461,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       InkWell(
                         onTap: () {
                           debugPrint('History button tapped');
-                          Navigator.pushReplacement(
-                            context,
+                          Navigator.of(context).pushAndRemoveUntil(
                             MaterialPageRoute(
                                 builder: (context) => const History()),
+                            (Route<dynamic> route) => false,
                           );
                         },
                         child: MouseRegion(
