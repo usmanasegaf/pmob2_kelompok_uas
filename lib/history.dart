@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:pmob2_kelompok_uas/home.dart';
+import 'package:pmob2_kelompok_uas/open_file.dart';
 
 class History extends StatelessWidget {
   const History({super.key});
@@ -233,6 +234,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             onTap: () {
                               debugPrint(
                                   'Item ${item['nama_laporan']} (ID: $id) diklik');
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => OpenFileScreen(
+                                    isScan: isScanActive,
+                                    itemId: id ??
+                                        '', // Mengirim ID item yang dipilih
+                                  ),
+                                ),
+                              );
                             },
                             child: Padding(
                               padding: const EdgeInsets.all(12),
