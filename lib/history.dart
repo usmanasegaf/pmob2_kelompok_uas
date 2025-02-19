@@ -29,6 +29,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
   List<Map<String, dynamic>> historyScanItems = [];
   List<Map<String, dynamic>> historyCreateItems = [];
 
+  final String baseUrl = 'https://purring-scratch-plutonium.glitch.me';
+
   @override
   void initState() {
     super.initState();
@@ -38,9 +40,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Future<void> fetchHistoryData() async {
     try {
       final scanResponse =
-          await http.get(Uri.parse('http://localhost:3000/api/laporan_scan'));
+          await http.get(Uri.parse('$baseUrl/api/laporan_scan'));
       final createResponse =
-          await http.get(Uri.parse('http://localhost:3000/api/laporan_create'));
+          await http.get(Uri.parse('$baseUrl/api/laporan_create'));
 
       if (scanResponse.statusCode == 200) {
         List<dynamic> scanData = json.decode(scanResponse.body);
@@ -76,7 +78,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   Future<void> _deleteHistoryItem(String itemId, bool isScan) async {
     final endpoint = isScan ? 'laporan_scan' : 'laporan_create';
-    final url = Uri.parse('http://localhost:3000/api/$endpoint/$itemId');
+    final url =
+        Uri.parse('$baseUrl/api/$endpoint/$itemId'); // Menggunakan baseUrl
 
     try {
       final response = await http.delete(url);
