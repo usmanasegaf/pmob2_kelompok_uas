@@ -34,11 +34,48 @@ class _ShowQrScreenState extends State<ShowQrScreen> {
       _errorMessage = null;
     });
 
+    // Mencoba parse JSON dari scannedData
+    Map<String, dynamic>? qrData;
+    bool isValidFormat = false; // Inisialisasi isValidFormat di luar try-catch
+    try {
+      qrData = json.decode(widget.scannedData);
+      isValidFormat = qrData != null &&
+          qrData['nama_laporan'] != null &&
+          qrData['lokasi'] != null &&
+          qrData['tanggal'] != null &&
+          qrData['deskripsi'] != null;
+    } catch (e) {
+      qrData = null;
+      isValidFormat = false; // Format tetap tidak valid jika gagal parse JSON
+    }
+
+    Map<String, dynamic> dataToSave;
+    if (isValidFormat) {
+      // Jika format valid, kirim data dari QR Code
+      dataToSave = json.decode(widget.scannedData);
+    } else {
+      // Jika format tidak valid, kirim data default dengan tanggal saat ini
+      dataToSave = {
+        'nama_laporan': 'Other QR', // Atau nilai default lain yang sesuai
+        'lokasi': 'Other QR', // Atau nilai default lain yang sesuai
+        'tanggal': DateTime.now()
+            .toIso8601String(), // Gunakan tanggal saat ini dengan format ISO 8601
+        'deskripsi':
+            widget.scannedData, // Tetap kirim raw data sebagai deskripsi
+        'qr_code': widget.scannedData, // Tetap kirim raw data untuk qr_code
+      };
+      setState(() {
+        _errorMessage =
+            'Format QR tidak sesuai, data yang disimpan adalah data default dengan tanggal saat ini.'; // Pesan error format tidak valid
+      });
+    }
+
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/scan'), // Gunakan baseUrl di sini
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({'qr_code': widget.scannedData}),
+        body: json
+            .encode(dataToSave), // Kirim dataToSave (bisa dari QR atau default)
       );
 
       if (response.statusCode == 200) {
