@@ -33,10 +33,11 @@ class _ShowQrScreenState extends State<ShowQrScreen> {
       _isSaving = true;
       _errorMessage = null;
     });
+    debugPrint('Mulai _saveQrToBackend');
 
     // Mencoba parse JSON dari scannedData
     Map<String, dynamic>? qrData;
-    bool isValidFormat = false; // Inisialisasi isValidFormat di luar try-catch
+    bool isValidFormat = false;
     try {
       qrData = json.decode(widget.scannedData);
       isValidFormat = qrData != null &&
@@ -44,39 +45,45 @@ class _ShowQrScreenState extends State<ShowQrScreen> {
           qrData['lokasi'] != null &&
           qrData['tanggal'] != null &&
           qrData['deskripsi'] != null;
+      debugPrint('QR Code berhasil di-decode sebagai JSON');
     } catch (e) {
       qrData = null;
-      isValidFormat = false; // Format tetap tidak valid jika gagal parse JSON
+      isValidFormat = false;
+      debugPrint('QR Code bukan format JSON valid: ${e.toString()}');
     }
 
     Map<String, dynamic> dataToSave;
     if (isValidFormat) {
-      // Jika format valid, kirim data dari QR Code
-      dataToSave = json.decode(widget.scannedData);
+      // Jika format valid, gunakan data dari QR Code
+      dataToSave = qrData!; // Gunakan qrData yang sudah di-decode
     } else {
-      // Jika format tidak valid, kirim data default dengan tanggal saat ini
+      // Jika format tidak valid, gunakan data default
       dataToSave = {
-        'nama_laporan': 'Other QR', // Atau nilai default lain yang sesuai
-        'lokasi': 'Other QR', // Atau nilai default lain yang sesuai
-        'tanggal': DateTime.now()
-            .toIso8601String(), // Gunakan tanggal saat ini dengan format ISO 8601
-        'deskripsi':
-            widget.scannedData, // Tetap kirim raw data sebagai deskripsi
-        'qr_code': widget.scannedData, // Tetap kirim raw data untuk qr_code
+        'nama_laporan': 'Other QR',
+        'lokasi': 'Other QR',
+        'tanggal': DateTime.now().toIso8601String(),
+        'deskripsi': widget.scannedData,
       };
       setState(() {
         _errorMessage =
-            'Format QR tidak sesuai, data yang disimpan adalah data default dengan tanggal saat ini.'; // Pesan error format tidak valid
+            'Format QR tidak sesuai, data yang disimpan adalah data default dengan tanggal saat ini.';
       });
     }
 
+    // **Pastikan field 'qr_code' selalu ada dan diisi dengan widget.scannedData**
+    dataToSave['qr_code'] = widget.scannedData;
+    debugPrint('Data yang akan disimpan: $dataToSave');
+
     try {
+      debugPrint('Mencoba mengirim data ke backend: $dataToSave');
       final response = await http.post(
-        Uri.parse('$baseUrl/scan'), // Gunakan baseUrl di sini
+        Uri.parse('$baseUrl/scan'),
         headers: {'Content-Type': 'application/json'},
-        body: json
-            .encode(dataToSave), // Kirim dataToSave (bisa dari QR atau default)
+        body: json.encode(dataToSave),
       );
+
+      debugPrint('Response Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         if (mounted) {
@@ -91,10 +98,12 @@ class _ShowQrScreenState extends State<ShowQrScreen> {
       setState(() {
         _errorMessage = 'Gagal menyimpan QR Code: ${e.toString()}';
       });
+      debugPrint('Error saat menyimpan QR Code: ${e.toString()}');
     } finally {
       setState(() {
         _isSaving = false;
       });
+      debugPrint('_saveQrToBackend selesai, _isSaving: $_isSaving');
     }
   }
 
@@ -232,31 +241,6 @@ class _ShowQrScreenState extends State<ShowQrScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Column(
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          // Implementasi share
-                          debugPrint("Tombol Share");
-                        },
-                        borderRadius: BorderRadius.circular(8),
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.orange,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(Icons.share, color: Colors.black),
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      const Text(
-                        'Share',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(width: 40),
                   Column(
                     children: [
                       InkWell(

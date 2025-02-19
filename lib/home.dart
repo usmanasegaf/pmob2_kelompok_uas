@@ -193,10 +193,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                 jsonData['lokasi'] != null &&
                 jsonData['tanggal'] != null &&
                 jsonData['deskripsi'] != null) {
-              setState(() {
-                scannedData = rawValue;
-              });
-
               if (mounted) {
                 Navigator.push(
                   context,
@@ -204,6 +200,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                     builder: (context) => ShowQr(scannedData: rawValue),
                   ),
                 );
+                debugPrint(
+                    'Data dari galeri (rawValue): $rawValue'); // Debug print
               }
             } else {
               // JSON valid tapi tidak memiliki field yang diperlukan
@@ -218,10 +216,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             }
           } catch (e) {
             // Bukan format JSON yang valid
-            setState(() {
-              scannedData = rawValue;
-            });
-
             if (mounted) {
               Navigator.push(
                 context,
@@ -229,6 +223,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                   builder: (context) => ShowQr(scannedData: rawValue),
                 ),
               );
+              debugPrint(
+                  'Data dari galeri (rawValue - bukan JSON): $rawValue'); // Debug print
             }
           }
         }
@@ -245,7 +241,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error scanning QR Code: ${e.toString()}'),
+            content: Text(
+                'Error scanning QR Code dari galeri: ${e.toString()}'), // Error lebih detail
           ),
         );
       }
