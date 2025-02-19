@@ -40,6 +40,9 @@ class _OpenFileUIState extends State<OpenFileUI> {
   bool isLoading = true;
   String errorMessage = '';
 
+  final String baseUrl =
+      'https://purring-scratch-plutonium.glitch.me'; // Tambahkan baseUrl
+
   @override
   void initState() {
     super.initState();
@@ -53,7 +56,7 @@ class _OpenFileUIState extends State<OpenFileUI> {
     });
     final jenisLaporan = widget.isScan ? 'scan' : 'create';
     final url = Uri.parse(
-        'http://localhost:3000/api/laporan/$jenisLaporan/${widget.itemId}');
+        '$baseUrl/api/laporan/$jenisLaporan/${widget.itemId}'); // Gunakan baseUrl
 
     try {
       final response = await http.get(url);

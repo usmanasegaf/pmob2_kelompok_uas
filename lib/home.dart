@@ -7,6 +7,7 @@ import 'package:pmob2_kelompok_uas/show_qr.dart';
 import 'dart:convert';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http; // Tambahkan import http package
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -24,6 +25,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   bool _isFlashOn = false;
   bool _isRearCameraSelected = true;
 
+  final String baseUrl =
+      'https://purring-scratch-plutonium.glitch.me'; // Tambahkan baseUrl
+
   @override
   void initState() {
     super.initState();
@@ -39,6 +43,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             setState(() {});
           });
 
+    _fetchDataFromBackend(); // Panggil fungsi untuk fetch data saat initState
     _initializeCamera();
   }
 
@@ -278,6 +283,23 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       _isRearCameraSelected = !_isRearCameraSelected;
     });
     await _initializeCamera();
+  }
+
+  // Fungsi contoh untuk mengambil data dari backend
+  Future<void> _fetchDataFromBackend() async {
+    try {
+      final response = await http
+          .get(Uri.parse('$baseUrl/api/laporan_scan')); // Contoh endpoint
+      if (response.statusCode == 200) {
+        debugPrint('Data dari backend berhasil diambil: ${response.body}');
+        // Anda bisa melakukan sesuatu dengan data ini, misalnya menyimpannya di state
+      } else {
+        debugPrint(
+            'Gagal mengambil data dari backend. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error fetching data from backend: $e');
+    }
   }
 
   @override

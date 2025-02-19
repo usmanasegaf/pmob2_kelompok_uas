@@ -25,6 +25,8 @@ class ShowQrScreen extends StatefulWidget {
 class _ShowQrScreenState extends State<ShowQrScreen> {
   bool _isSaving = false;
   String? _errorMessage;
+  final String baseUrl =
+      'https://purring-scratch-plutonium.glitch.me'; // Tambahkan baseUrl
 
   Future<void> _saveQrToBackend() async {
     setState(() {
@@ -34,7 +36,7 @@ class _ShowQrScreenState extends State<ShowQrScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://localhost:3000/scan'),
+        Uri.parse('$baseUrl/scan'), // Gunakan baseUrl di sini
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'qr_code': widget.scannedData}),
       );
