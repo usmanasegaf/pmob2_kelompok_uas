@@ -26,6 +26,8 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _vibrateEnabled = true;
   bool _beepEnabled = false;
+  final String baseUrl =
+      'https://purring-scratch-plutonium.glitch.me'; // Tambahkan baseUrl
 
   @override
   void initState() {
@@ -34,8 +36,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _fetchSettings() async {
-    final response =
-        await http.get(Uri.parse('http://localhost:3000/api/settings'));
+    final response = await http
+        .get(Uri.parse('$baseUrl/api/settings')); // Gunakan baseUrl di sini
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -48,7 +50,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _updateSettings() async {
     await http.post(
-      Uri.parse('http://localhost:3000/api/settings'),
+      Uri.parse('$baseUrl/api/settings'), // Gunakan baseUrl di sini
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'vibrate': _vibrateEnabled ? 1 : 0,

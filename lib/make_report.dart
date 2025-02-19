@@ -30,9 +30,12 @@ class _ReportScreenState extends State<ReportScreen> {
   final TextEditingController _descriptionController = TextEditingController();
   String? qrCodeUrl;
   bool isLoading = false;
+  final String baseUrl =
+      'https://purring-scratch-plutonium.glitch.me'; // Tambahkan baseUrl
 
   String getCurrentDateTime() {
-    return DateFormat('dd MMM yyyy, HH:mm').format(DateTime.now());
+    return DateFormat('dd MMM yyyy, HH:mm')
+        .format(DateTime.now()); // Format tanggal diubah
   }
 
   Future<void> _generateQRCode() async {
@@ -40,7 +43,8 @@ class _ReportScreenState extends State<ReportScreen> {
       isLoading = true;
     });
 
-    final String apiUrl = 'http://localhost:3000/api/laporan_create';
+    final String apiUrl =
+        '$baseUrl/api/laporan_create'; // Gunakan baseUrl di sini
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -60,7 +64,7 @@ class _ReportScreenState extends State<ReportScreen> {
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to generate report')),
+          const SnackBar(content: Text('Failed to generate report')),
         );
       }
     } catch (e) {
