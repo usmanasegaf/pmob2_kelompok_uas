@@ -3,6 +3,9 @@ import 'package:intl/intl.dart';
 import 'package:pmob2_kelompok_uas/home.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
+import 'dart:typed_data'; // Import dart:typed_data for Uint8List
 
 class MakeReport extends StatelessWidget {
   const MakeReport({super.key});
@@ -28,24 +31,23 @@ class _ReportScreenState extends State<ReportScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  String? qrCodeUrl;
+  Uint8List? qrCodeBytes; // Change qrCodeUrl to qrCodeBytes and use Uint8List
   bool isLoading = false;
-  final String baseUrl =
-      'https://purring-scratch-plutonium.glitch.me'; // Tambahkan baseUrl
+  final String baseUrl = 'https://purring-scratch-plutonium.glitch.me';
 
   String getCurrentDateTime() {
-    return DateFormat('dd MMM yyyy, HH:mm')
-        .format(DateTime.now()); // Format tanggal diubah
+    return DateFormat('dd MMM yyyy, HH:mm').format(DateTime.now());
   }
 
   Future<void> _generateQRCode() async {
     setState(() {
       isLoading = true;
+      debugPrint('GenerateQRCode: Set isLoading to true');
     });
 
-    final String apiUrl =
-        '$baseUrl/api/laporan_create'; // Gunakan baseUrl di sini
+    final String apiUrl = '$baseUrl/api/laporan_create';
     try {
+      debugPrint('GenerateQRCode: Calling API - $apiUrl');
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {'Content-Type': 'application/json'},
@@ -56,24 +58,42 @@ class _ReportScreenState extends State<ReportScreen> {
           'deskripsi': _descriptionController.text,
         }),
       );
+      debugPrint(
+          'GenerateQRCode: API Response Status Code - ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        debugPrint('GenerateQRCode: API Response Body - $data');
+        String base64String =
+            data['qrCode'].split(',').last; // Extract base64 data
+        debugPrint('GenerateQRCode: Base64 String extracted');
+
+        Stopwatch stopwatch = Stopwatch()..start(); // Start stopwatch
+        Uint8List decodedBytes = base64Decode(base64String); // Decode base64
+        stopwatch.stop();
+        debugPrint(
+            'GenerateQRCode: Base64 Decoded in ${stopwatch.elapsedMilliseconds}ms');
+
         setState(() {
-          qrCodeUrl = data['qrCode'];
+          qrCodeBytes = decodedBytes; // Store decoded bytes
         });
+        debugPrint('GenerateQRCode: SetState called with decoded bytes');
       } else {
+        debugPrint(
+            'GenerateQRCode: API Failed - Status Code: ${response.statusCode}');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to generate report')),
         );
       }
     } catch (e) {
+      debugPrint('GenerateQRCode: Error during API call - $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
     } finally {
       setState(() {
         isLoading = false;
+        debugPrint('GenerateQRCode: Set isLoading to false');
       });
     }
   }
@@ -89,7 +109,6 @@ class _ReportScreenState extends State<ReportScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header with back button and title
                 Row(
                   children: [
                     Container(
@@ -123,10 +142,7 @@ class _ReportScreenState extends State<ReportScreen> {
                     ),
                   ],
                 ),
-
                 SizedBox(height: 24),
-
-                // Main content card
                 Container(
                   decoration: BoxDecoration(
                     border: Border.symmetric(
@@ -141,15 +157,12 @@ class _ReportScreenState extends State<ReportScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // Calendar icon
                         Icon(
                           Icons.calendar_today,
                           color: Colors.orange,
                           size: 48,
                         ),
                         SizedBox(height: 24),
-
-                        // Form fields
                         _buildTextField(
                             'Report name', 'Enter name', _nameController),
                         SizedBox(height: 16),
@@ -167,10 +180,18 @@ class _ReportScreenState extends State<ReportScreen> {
                           maxLines: 4,
                         ),
                         SizedBox(height: 32),
-
-                        // Generate QR Code button
                         ElevatedButton(
-                          onPressed: isLoading ? null : _generateQRCode,
+                          onPressed: isLoading
+                              ? null
+                              : () {
+                                  WidgetsBinding
+                                      .instance.focusManager.primaryFocus
+                                      ?.unfocus();
+                                  Future.delayed(
+                                      const Duration(milliseconds: 100), () {
+                                    _generateQRCode();
+                                  });
+                                },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orange,
                             minimumSize: Size(200, 45),
@@ -196,8 +217,7 @@ class _ReportScreenState extends State<ReportScreen> {
                                   ),
                                 ),
                         ),
-
-                        if (qrCodeUrl != null) ...[
+                        if (qrCodeBytes != null) ...[
                           SizedBox(height: 24),
                           Container(
                             decoration: BoxDecoration(
@@ -205,8 +225,9 @@ class _ReportScreenState extends State<ReportScreen> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             padding: EdgeInsets.all(16),
-                            child: Image.network(
-                              qrCodeUrl!,
+                            child: Image.memory(
+                              // Use Image.memory with decoded bytes
+                              qrCodeBytes!,
                               height: 200,
                               width: 200,
                             ),
